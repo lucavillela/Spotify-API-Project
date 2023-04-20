@@ -10,8 +10,11 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="title">LucaSpotify</h1>
+
+        <h1 class="title">In9Spotify</h1>
+
         <div class="buttons">
+
           <button id="topSongsButton" class="button button4">Minhas Top Músicas</button>
           <div id="caixa-musica" class="caixa-musica grey-box">
             <p id="songsText" class="grey-box-text"> <ol class="lista">
@@ -20,6 +23,7 @@
               <% }); %>
             </ol> </p>
           </div>
+
           <button id="topArtistsButton" class="button button5">Meus Top Artistas</button>
           <div id="caixa-artista" class="caixa-artista grey-box">
             <p id="artistsText" class="grey-box-text"><ol class="lista">
@@ -28,6 +32,7 @@
               <% }); %>
             </ol></p>
           </div>
+
           <button id="recentSongsButton" class="button button6">Minhas Músicas Recentes</button>
           <div id="caixa-musica-recente" class="caixa-musica-recente grey-box">
             <p id="recentSongsText" class="grey-box-text"> <ol class="lista">
@@ -35,6 +40,26 @@
                 <li><%= musicaRecente %></li>
               <% }); %>
             </ol> </p>
+          </div>
+
+          <div id="containerPlayer" class="container-playing">
+            <img src="<%= playingFoto %>" alt="Capa do álbum">
+            <div class="playing-text">
+              <span class="playing-music"><%= playingMusica %></span>
+              <span class="playing-artist"><%= playingArtista %></span>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="prevButton" class="btnPauseProx btn-backward">
+              <img class="pauseProx" src="images/anterior.svg" alt="">
+            </button>
+            <button id="pauseButton"  class="btnPauseProx pauseButton">
+              <img class="pauseProx" src="images/pause.svg" alt="">
+            </button>
+            <button id="nextButton" class="btnPauseProx btn-forward">
+              <img class="pauseProx" src="images/proximo.svg" alt="">
+            </button>
           </div>
         </div>
       </div>
