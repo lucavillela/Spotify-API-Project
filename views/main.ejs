@@ -15,6 +15,31 @@
 
         <div class="buttons">
 
+          <div id="containerPlayer" class="container-playing">
+            <img src="<%= playingFoto %>" alt="Capa do álbum">
+            <div class="playing-text">
+              <span id="playing-music" class="playing-music"><%= playingMusica %></span>
+              <span class="playing-artist"><%= playingArtista %></span>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="prevButton" class="btnPauseProx btn-backward">
+              <img class="pauseProx" src="images/anterior.svg" alt="">
+            </button>
+            <button id="pauseButton"  class="btnPauseProx pauseButton">
+              <img id="imagem-pause-play" class="pauseProx" src="images/pause.svg" alt="">
+            </button>
+            <button id="nextButton" class="btnPauseProx btn-forward">
+              <img class="pauseProx" src="images/proximo.svg" alt="">
+            </button>
+            <button id="muteButton" class="btnPauseProx btn-mute">
+              <img class="pauseProx mute" src="images/mute.svg" alt="">
+            </button>
+          </div>
+
+          <button id="ConfigurarPlayerButton" class="button button9">Configurar Player</button>
+
           <button id="topSongsButton" class="button button4">Minhas Top Músicas</button>
           <div id="caixa-musica" class="caixa-musica grey-box">
             <p id="songsText" class="grey-box-text"> <ol class="lista">
@@ -40,26 +65,6 @@
                 <li><%= musicaRecente %></li>
               <% }); %>
             </ol> </p>
-          </div>
-
-          <div id="containerPlayer" class="container-playing">
-            <img src="<%= playingFoto %>" alt="Capa do álbum">
-            <div class="playing-text">
-              <span class="playing-music"><%= playingMusica %></span>
-              <span class="playing-artist"><%= playingArtista %></span>
-            </div>
-          </div>
-
-          <div class="controls">
-            <button id="prevButton" class="btnPauseProx btn-backward">
-              <img class="pauseProx" src="images/anterior.svg" alt="">
-            </button>
-            <button id="pauseButton"  class="btnPauseProx pauseButton">
-              <img class="pauseProx" src="images/pause.svg" alt="">
-            </button>
-            <button id="nextButton" class="btnPauseProx btn-forward">
-              <img class="pauseProx" src="images/proximo.svg" alt="">
-            </button>
           </div>
         </div>
       </div>

@@ -131,7 +131,8 @@ body {
   justify-content: space-between;
   align-items: center;
   
-  width: 180px;
+  width: 260px;
+  margin-bottom: 20px;
 }
 
 .btnPauseProx {
@@ -153,4 +154,11 @@ body {
   border: none;
   
 }
+.mute img {
+  height: 20px;
+}
+
+#muteButton{
+  display: none;
+} 
   

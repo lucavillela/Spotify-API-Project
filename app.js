@@ -1,5 +1,4 @@
 const express = require('express');
-const { forEach } = require('lodash');
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const port = 8888;
@@ -26,14 +25,15 @@ const scopes = [
 ];
 
 var spotifyApi = new SpotifyWebApi({
-    clientId: "< CLIENT_ID >",
-    clientSecret: "< CLIENT_SECRET >",
+    clientId: "<CLIENT_ID>",
+    clientSecret: "<CLIENT_SECRET>",
     redirectUri: "http://localhost:8888/callback",
 });
 
 const app = express(); 
 let idUsuario = "";
-let access_token = "alo";
+let access_token = "";
+let MusicaTocando;
 
 class Playlist {
   constructor(name, cover, uri, owner) {
@@ -41,6 +41,14 @@ class Playlist {
     this.cover = cover;
     this.uri = uri;
     this.owner = owner;
+  }
+}
+
+class Device {
+  constructor(name, type, id) {
+    this.name = name;
+    this.type = type;
+    this.id = id;
   }
 }
 
@@ -121,14 +129,16 @@ app.get('/main', (req, res) => {
     let playingArtista = "";
     let playingFoto = "";
     if (playbackStateData.body && playbackStateData.body.is_playing){
-      playingMusica = playingData.body.item.name;
+      playingMusica = playingData.body.item.name; 
       playingArtista = playingData.body.item.artists[0].name;
       playingFoto = playingData.body.item.album.images[0].url;
+      MusicaTocando = true;
     }
     else {
-      playingMusica = "Dê play";
-      playingArtista = "em alguma musica no seu Spotify e recarregue a página";
-      playingFoto = "images/nada.jpeg"; 
+      playingMusica = "Clique em";
+      playingArtista = "Configurar player para começar a tocar alguma música";  
+      playingFoto = "images/nada.jpeg";
+      MusicaTocando = false;  
     }
     idUsuario = meData.body.id;
     res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto});
@@ -151,55 +161,89 @@ app.get('/config', (req, res) => {
       ArrayPlaylist.push(p);
     }
     for(i = 0; i < devicesData.body.devices.length; i++){
-      ArrayDevices.push(devicesData.body.devices[i].id);
-      console.log(devicesData.body.devices[0]); 
+      d = new Device(devicesData.body.devices[i].name, devicesData.body.devices[i].type, devicesData.body.devices[i].id);
+      ArrayDevices.push(d);
     }
-    res.render('config', {ArrayPlaylist: ArrayPlaylist});
+    res.render('config', {ArrayPlaylist: ArrayPlaylist, ArrayDevices: ArrayDevices});
   }, function(err) {
     console.error(err);
     res.send("Algo deu errado!");
   });  
-});   
+});    
 
 app.get('/pause', (req, res) => {
-  spotifyApi.pause()
-  .then(function() {
-    res.redirect(307, 'http://localhost:8888/main');
-  }, function(err) {
-    console.error(err);
-    res.send("Algo deu errado!");
-  });
+  if(MusicaTocando){
+    spotifyApi.pause()
+      .then(function() {
+        res.redirect(307, 'http://localhost:8888/main');
+      }, function(err) {
+        console.error(err);
+        res.send("Algo deu errado!");
+      });
+  }
+
+  else res.redirect(307, 'http://localhost:8888/main');
+  
 });
 
 app.get('/play', (req, res) => {
-  spotifyApi.pause()
-  .then(function() {
-    res.redirect(307, 'http://localhost:8888/main');
-  }, function(err) {
-    console.error(err);
-    res.send("Algo deu errado!");
-  });
+
+  var playlist = req.query.playlist;
+  var device = req.query.device;
+
+  spotifyApi.play({
+    "context_uri": playlist,
+    "device_id": device, 
+  })
+    .then(function() {
+      res.redirect(307, 'http://localhost:8888/main');
+    }, function(err) {
+      res.send("Algo deu errado!");
+    });
 });
 
 app.get('/next', (req, res) => {
-  spotifyApi.skipToNext()
-  .then(function() {
-    res.redirect(307, 'http://localhost:8888/main');
-  }, function(err) {
-    console.error(err);
-    res.send("Algo deu errado!");
-  });
-})
+  if(MusicaTocando){
+    spotifyApi.skipToNext()
+      .then(function() {
+        res.redirect(307, 'http://localhost:8888/main');
+      }, function(err) {
+        console.error(err);
+        res.send("Algo deu errado!");
+      });
+  }
+  else res.redirect(307, 'http://localhost:8888/main');
+});
 
 app.get('/prev', (req, res) => {
-  spotifyApi.skipToPrevious()
-  .then(function() {
-    res.redirect(307, 'http://localhost:8888/main');
-  }, function(err) {
-    console.error(err);
-    res.send("Algo deu errado!");
-  });
-})
-   
+  if(MusicaTocando){
+    spotifyApi.skipToPrevious()
+      .then(function() {
+        res.redirect(307, 'http://localhost:8888/main');
+      }, function(err) {
+        console.error(err);
+        res.send("Algo deu errado!");  
+      });
+  }
+  else res.redirect(307, 'http://localhost:8888/main'); 
+}); 
+
+app.get('/mute', function(req, res) {
+  spotifyApi.getMyCurrentPlaybackState()
+    .then(function(data) {
+      let currPorcVol = data.body.device.volume_percent;
+      let newPorcVol;
+
+      if (currPorcVol > 0) newPorcVol = 0;
+      else newPorcVol = 100; 
+
+    spotifyApi.setVolume(newPorcVol)
+      .then(function () {
+        res.redirect(307, 'http://localhost:8888/main');
+        }, function(err) {
+            request.send('Algo deu errado!')
+      });
+    })
+});
   
 app.listen(port, () => console.info("Site rodando no http://localhost:8888"));
