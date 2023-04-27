@@ -11,7 +11,7 @@ body {
 
 .container {
 	width: 250px;
-	height: 200px;
+	height: 230px;
 	background-color: #333;
 	border-radius: 20px;
 	margin: auto;
@@ -19,14 +19,24 @@ body {
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 0px; 
+	padding: 10px; 
 	text-align: center;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); 
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    row-gap: 25px; 
 }
 
-.titulo {
-	font-size: 36px;
-	margin-top: 0;
+.titulo-erro{
+    font-size: 30px;
+	margin: 0px;
+    color: rgb(241, 114, 114);
+
+    margin-bottom: 0px;
+}
+
+.msg-erro{
+    font-size: 14px;
+    margin: 0px;
+    width: 220px;
 }
 
 .green-button {
@@ -38,9 +48,9 @@ body {
 	font-size: 18px;
 	cursor: pointer;
 	transition: background-color 0.2s;
+    margin: 0px;
 }
 
 .green-button:hover {
 	background-color: #1AA34A;
 }
-

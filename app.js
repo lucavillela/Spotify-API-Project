@@ -103,8 +103,6 @@ app.get('/callback', (req, res) => {
 });
 
 app.get('/main', (req, res) => {
-  
-  var erro = req.query.erro;
 
   Promise.all([
     spotifyApi.getMyTopArtists({limit: 20}),
@@ -134,10 +132,9 @@ app.get('/main', (req, res) => {
       MusicaTocando = false;  
     }
     idUsuario = meData.body.id;
-    res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto, erro: erro});
+    res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto});
   }, function(err) {
-    console.error(err);
-    res.redirect(307, 'http://localhost:8888/main?erro=1');
+    res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`); 
   }); 
 });
 
@@ -172,9 +169,7 @@ app.get('/config', (req, res) => {
     }
     res.render('config', {ArrayPlaylist: ArrayPlaylist, ArrayDevices: ArrayDevices});
   }, function(err) {
-    console.error(err);
-    
-    res.redirect(307, 'http://localhost:8888/main?erro=1');
+    res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
   });  
 });    
 
@@ -186,9 +181,7 @@ app.get('/pause', (req, res) => {
       .then(function() {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
-        console.error(err);
-        
-        res.redirect(307, 'http://localhost:8888/main?erro=1');
+        res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
       });
   }
 
@@ -208,8 +201,7 @@ app.get('/player', (req, res) => {
     .then(function() {
       res.redirect(307, 'http://localhost:8888/main');
     }, function(err) {
-      
-      res.redirect(307, 'http://localhost:8888/main?erro=1');
+      res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
     });
 });
 
@@ -219,9 +211,7 @@ app.get('/next', (req, res) => {
       .then(function() {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
-        console.error(err);
-        
-        res.redirect(307, 'http://localhost:8888/main?erro=1');
+        res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
       });
   }
   else res.redirect(307, 'http://localhost:8888/main');
@@ -233,9 +223,7 @@ app.get('/prev', (req, res) => {
       .then(function() {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
-        console.error(err);
-        
-        res.redirect(307, 'http://localhost:8888/main?erro=1');  
+        res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
       });
   }
   else res.redirect(307, 'http://localhost:8888/main'); 
@@ -254,8 +242,7 @@ app.get('/mute', function(req, res) {
       .then(function () {
         res.redirect(307, 'http://localhost:8888/main');
         }, function(err) {
-           
-            res.redirect(307, 'http://localhost:8888/main?erro=1'); 
+          res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`);
       });
     })
 });
@@ -269,6 +256,11 @@ app.get('/play', function (req, res) {
   }, function(err) {
     res.redirect(307, 'http://localhost:8888/config');
   });
+});
+
+app.get('/erro', (req, res) => {
+  var erro = req.query.erro
+  res.render('erro', {erro: erro})
 });
   
 app.listen(port, () => console.info("Site rodando no http://localhost:8888"));

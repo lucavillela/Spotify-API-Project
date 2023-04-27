@@ -13,12 +13,6 @@ const playingMusic = document.getElementById("playing-music");
 const ImagemPausePlay = document.getElementById("imagem-pause-play");
 const erro = document.getElementById("erro");
 
-if (erro.textContent == '1'){
-    erro.style.display = 'block';
-    erro.textContent = "Algo deu errado. Recarregue a página e tente novamente.";
-}
-else {erro.style.display = 'none';}
-
 if(playingMusic.textContent != null && playingMusic.textContent != 'Clique'){
     ImagemPausePlay.src = 'images/pause.svg';
 }
