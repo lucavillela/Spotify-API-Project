@@ -87,20 +87,10 @@ app.get('/callback', (req, res) => {
   
         spotifyApi.setAccessToken(access_token);
         spotifyApi.setRefreshToken(refresh_token);
-  
-        console.log('access_token:', access_token);
-        console.log('refresh_token:', refresh_token);
-  
-        console.log(
-          `Sucessfully retreived access token. Expires in ${expires_in} s.`
-        );
    
         setInterval(async () => {
           const data = await spotifyApi.refreshAccessToken();
           access_token = data.body['access_token'];
-  
-          console.log('The access token has been refreshed!');
-          console.log('access_token:', access_token);
           spotifyApi.setAccessToken(access_token);
         }, expires_in / 2 * 1000);
 
@@ -113,6 +103,9 @@ app.get('/callback', (req, res) => {
 });
 
 app.get('/main', (req, res) => {
+  
+  var erro = req.query.erro;
+
   Promise.all([
     spotifyApi.getMyTopArtists({limit: 20}),
     spotifyApi.getMyTopTracks({limit: 20}),
@@ -122,29 +115,29 @@ app.get('/main', (req, res) => {
     spotifyApi.getMe()
   ])
   .then(function([artistData, trackData, recentlyPlayedData, playbackStateData, playingData, meData]) {
-    let artistas = artistData.body.items.map(artist => artist.name).join(', ');
-    let musicas = trackData.body.items.map(track => `${track.name} - ${track.artists[0].name}`).join(', ');
-    let musicasRecentes = recentlyPlayedData.body.items.map(item => `${item.track.name} - ${item.track.artists[0].name}`).join(', ');
+    let artistas = artistData.body.items.map(artist => artist.name).join('? ');
+    let musicas = trackData.body.items.map(track => `${track.name} - ${track.artists[0].name}`).join('? ');
+    let musicasRecentes = recentlyPlayedData.body.items.map(item => `${item.track.name} - ${item.track.artists[0].name}`).join('? ');
     let playingMusica = "";
     let playingArtista = "";
     let playingFoto = "";
     if (playbackStateData.body && playbackStateData.body.is_playing){
       playingMusica = playingData.body.item.name; 
       playingArtista = playingData.body.item.artists[0].name;
-      playingFoto = playingData.body.item.album.images[0].url;
+      playingFoto = playingData.body.item.album.images[0].url;   
       MusicaTocando = true;
     }
     else {
-      playingMusica = "Clique em";
-      playingArtista = "Configurar player para começar a tocar alguma música";  
+      playingMusica = "Clique";
+      playingArtista = "Play para continuar o que estava tocando";  
       playingFoto = "images/nada.jpeg";
       MusicaTocando = false;  
     }
     idUsuario = meData.body.id;
-    res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto});
+    res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto, erro: erro});
   }, function(err) {
     console.error(err);
-    res.send("Algo deu errado!");
+    res.redirect(307, 'http://localhost:8888/main?erro=1');
   }); 
 });
 
@@ -156,29 +149,46 @@ app.get('/config', (req, res) => {
   .then(function([playlistsData, devicesData]) {
     let ArrayPlaylist = [];
     let ArrayDevices = [];
-    for(i = 0; i < playlistsData.body.items.length; i++){
-      p = new Playlist(playlistsData.body.items[i].name, playlistsData.body.items[i].images[0].url, playlistsData.body.items[i].uri, playlistsData.body.items[i].owner.display_name);
-      ArrayPlaylist.push(p);
+    
+    if(playlistsData.body.items.length < 1){
+      p = new Playlist("Sem playlists", "images/nada.jpeg", "Adicione playlists na sua bibloteca para tocá-las por aqui.");
+      ArrayPlaylist.push(p); 
     }
-    for(i = 0; i < devicesData.body.devices.length; i++){
-      d = new Device(devicesData.body.devices[i].name, devicesData.body.devices[i].type, devicesData.body.devices[i].id);
+    else{
+      for(i = 0; i < playlistsData.body.items.length; i++){
+        p = new Playlist(playlistsData.body.items[i].name, playlistsData.body.items[i].images[0].url, playlistsData.body.items[i].uri, playlistsData.body.items[i].owner.display_name);
+        ArrayPlaylist.push(p);
+      }
+    }
+    if(devicesData.body.devices.length < 1){
+      d = new Device("Sem dispositivos ativos", "Inicie seu Spotify em algum dispositivo e recarregue para que ele apareça aqui.");
       ArrayDevices.push(d);
+    }
+    else{
+      for(i = 0; i < devicesData.body.devices.length; i++){
+        d = new Device(devicesData.body.devices[i].name, devicesData.body.devices[i].type, devicesData.body.devices[i].id);
+        ArrayDevices.push(d);
+      }
     }
     res.render('config', {ArrayPlaylist: ArrayPlaylist, ArrayDevices: ArrayDevices});
   }, function(err) {
     console.error(err);
-    res.send("Algo deu errado!");
+    
+    res.redirect(307, 'http://localhost:8888/main?erro=1');
   });  
 });    
 
 app.get('/pause', (req, res) => {
   if(MusicaTocando){
-    spotifyApi.pause()
+    spotifyApi.pause({
+      "data": "",
+    })
       .then(function() {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
         console.error(err);
-        res.send("Algo deu errado!");
+        
+        res.redirect(307, 'http://localhost:8888/main?erro=1');
       });
   }
 
@@ -186,7 +196,7 @@ app.get('/pause', (req, res) => {
   
 });
 
-app.get('/play', (req, res) => {
+app.get('/player', (req, res) => {
 
   var playlist = req.query.playlist;
   var device = req.query.device;
@@ -198,7 +208,8 @@ app.get('/play', (req, res) => {
     .then(function() {
       res.redirect(307, 'http://localhost:8888/main');
     }, function(err) {
-      res.send("Algo deu errado!");
+      
+      res.redirect(307, 'http://localhost:8888/main?erro=1');
     });
 });
 
@@ -209,7 +220,8 @@ app.get('/next', (req, res) => {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
         console.error(err);
-        res.send("Algo deu errado!");
+        
+        res.redirect(307, 'http://localhost:8888/main?erro=1');
       });
   }
   else res.redirect(307, 'http://localhost:8888/main');
@@ -222,7 +234,8 @@ app.get('/prev', (req, res) => {
         res.redirect(307, 'http://localhost:8888/main');
       }, function(err) {
         console.error(err);
-        res.send("Algo deu errado!");  
+        
+        res.redirect(307, 'http://localhost:8888/main?erro=1');  
       });
   }
   else res.redirect(307, 'http://localhost:8888/main'); 
@@ -241,9 +254,21 @@ app.get('/mute', function(req, res) {
       .then(function () {
         res.redirect(307, 'http://localhost:8888/main');
         }, function(err) {
-            request.send('Algo deu errado!')
+           
+            res.redirect(307, 'http://localhost:8888/main?erro=1'); 
       });
     })
+});
+
+app.get('/play', function (req, res) {
+  spotifyApi.play({
+    "data": "",
+  })
+  .then(function() {
+    res.redirect(307, 'http://localhost:8888/main');
+  }, function(err) {
+    res.redirect(307, 'http://localhost:8888/config');
+  });
 });
   
 app.listen(port, () => console.info("Site rodando no http://localhost:8888"));

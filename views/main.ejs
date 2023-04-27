@@ -11,6 +11,7 @@
 <body>
     <div class="container">
 
+      <p id="erro" class="alerta-erro"><%= erro %></p>
         <h1 class="title">In9Spotify</h1>
 
         <div class="buttons">
@@ -28,7 +29,7 @@
               <img class="pauseProx" src="images/anterior.svg" alt="">
             </button>
             <button id="pauseButton"  class="btnPauseProx pauseButton">
-              <img id="imagem-pause-play" class="pauseProx" src="images/pause.svg" alt="">
+              <img id="imagem-pause-play" class="pauseProx" src="images/play.svg" alt="">
             </button>
             <button id="nextButton" class="btnPauseProx btn-forward">
               <img class="pauseProx" src="images/proximo.svg" alt="">
@@ -43,7 +44,7 @@
           <button id="topSongsButton" class="button button4">Minhas Top Músicas</button>
           <div id="caixa-musica" class="caixa-musica grey-box">
             <p id="songsText" class="grey-box-text"> <ol class="lista">
-              <% musicas.split(', ').forEach(function(musica) { %>
+              <% musicas.split('? ').forEach(function(musica) { %>
                 <li><%= musica %></li>
               <% }); %>
             </ol> </p>
@@ -52,7 +53,7 @@
           <button id="topArtistsButton" class="button button5">Meus Top Artistas</button>
           <div id="caixa-artista" class="caixa-artista grey-box">
             <p id="artistsText" class="grey-box-text"><ol class="lista">
-              <% artistas.split(', ').forEach(function(artista) { %>
+              <% artistas.split('? ').forEach(function(artista) { %>
                 <li><%= artista %></li>
               <% }); %>
             </ol></p>
@@ -61,7 +62,7 @@
           <button id="recentSongsButton" class="button button6">Minhas Músicas Recentes</button>
           <div id="caixa-musica-recente" class="caixa-musica-recente grey-box">
             <p id="recentSongsText" class="grey-box-text"> <ol class="lista">
-              <% musicasRecentes.split(', ').forEach(function(musicaRecente) { %>
+              <% musicasRecentes.split('? ').forEach(function(musicaRecente) { %>
                 <li><%= musicaRecente %></li>
               <% }); %>
             </ol> </p>

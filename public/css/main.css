@@ -17,6 +17,7 @@ body {
   padding: 30px;
   text-align: center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  scale: 0.9;
 }
 
 
@@ -160,5 +161,12 @@ body {
 
 #muteButton{
   display: none;
-} 
+}
+
+.alerta-erro{
+  display: none;
+  text-align: center;
+  font-size: 10px;
+  color: red;
+}
   

@@ -14,8 +14,11 @@ function Teste2(target) {
 }
 
 PlayButton.onclick = function() {
-    var url = `http://localhost:8888/play?playlist=${PlaylistUri}&device=${DeviceId}`;
-    window.location.href = url;
+    console.log(DeviceId);
+    if(PlaylistUri != "" && DeviceId != ""){
+        var url = `http://localhost:8888/player?playlist=${PlaylistUri}&device=${DeviceId}`;
+        window.location.href = url;
+    }
 }
 
 

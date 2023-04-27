@@ -9,8 +9,22 @@ const prevButton = document.getElementById("prevButton");
 const caixaMusica = document.getElementById("caixa-musica");
 const caixaArtista = document.getElementById("caixa-artista"); 
 const caixaRecente = document.getElementById("caixa-musica-recente");
-const playingMusica = document.getElementById("playing-musica"); 
+const playingMusic = document.getElementById("playing-music"); 
 const ImagemPausePlay = document.getElementById("imagem-pause-play");
+const erro = document.getElementById("erro");
+
+if (erro.textContent == '1'){
+    erro.style.display = 'block';
+    erro.textContent = "Algo deu errado. Recarregue a página e tente novamente.";
+}
+else {erro.style.display = 'none';}
+
+if(playingMusic.textContent != null && playingMusic.textContent != 'Clique'){
+    ImagemPausePlay.src = 'images/pause.svg';
+}
+else{
+    ImagemPausePlay.src = 'images/play.svg';
+}
 
 topSongsButton.onclick = function() {
     if (caixaMusica.style.display != 'block') {
@@ -47,13 +61,26 @@ recentSongsButton.onclick = function() {
 }
 
 muteButton.onclick = function() {
-    var url = 'http://localhost:8888/mute';
-    window.location.href = url;
+    if(playingMusica.textContent == null || playingMusica.textContent == 'Clique em'){
+        return;
+    }
+    else{
+        var url = 'http://localhost:8888/mute';
+        window.location.href = url; 
+    }
 }
 
 pauseButton.onclick = function() {
-    var url = 'http://localhost:8888/pause';
-    window.location.href = url;
+    
+    if(playingMusic.textContent != null && playingMusic.textContent != 'Clique'){
+        var url = 'http://localhost:8888/pause';
+        window.location.href = url; 
+    }
+    else{
+        var url = 'http://localhost:8888/play';
+        window.location.href = url; 
+    }
+
 }
 
 nextButton.onclick = function() {
