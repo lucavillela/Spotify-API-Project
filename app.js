@@ -25,8 +25,8 @@ const scopes = [
 ];
 
 var spotifyApi = new SpotifyWebApi({
-    clientId: "<CLIENT_ID>",
-    clientSecret: "<CLIENT_SECRET>",
+    clientId: "<SEU_CLIENT_ID>",
+    clientSecret: "SEU_CLIENT_SECRET",
     redirectUri: "http://localhost:8888/callback",
 });
 
@@ -86,6 +86,7 @@ app.get('/callback', (req, res) => {
         const expires_in = data.body['expires_in'];
   
         spotifyApi.setAccessToken(access_token);
+        //console.log("access token: " + access_token);
         spotifyApi.setRefreshToken(refresh_token);
    
         setInterval(async () => {
@@ -105,17 +106,17 @@ app.get('/callback', (req, res) => {
 app.get('/main', (req, res) => {
 
   Promise.all([
-    spotifyApi.getMyTopArtists({limit: 20}),
-    spotifyApi.getMyTopTracks({limit: 20}),
+    spotifyApi.getMyTopArtists({limit: 20, time_range: 'long_term'}),
+    spotifyApi.getMyTopTracks({limit: 20, time_range: 'long_term'}),
     spotifyApi.getMyRecentlyPlayedTracks({limit: 20}),
     spotifyApi.getMyCurrentPlaybackState(),
     spotifyApi.getMyCurrentPlayingTrack(),
     spotifyApi.getMe()
   ])
   .then(function([artistData, trackData, recentlyPlayedData, playbackStateData, playingData, meData]) {
-    let artistas = artistData.body.items.map(artist => artist.name).join('? ');
-    let musicas = trackData.body.items.map(track => `${track.name} - ${track.artists[0].name}`).join('? ');
-    let musicasRecentes = recentlyPlayedData.body.items.map(item => `${item.track.name} - ${item.track.artists[0].name}`).join('? ');
+    let artistas = artistData.body.items.map(artist => artist.name).join('# ');
+    let musicas = trackData.body.items.map(track => `${track.name} - ${track.artists[0].name}`).join('# ');
+    let musicasRecentes = recentlyPlayedData.body.items.map(item => `${item.track.name} - ${item.track.artists[0].name}`).join('# ');
     let playingMusica = "";
     let playingArtista = "";
     let playingFoto = "";
@@ -123,7 +124,7 @@ app.get('/main', (req, res) => {
       playingMusica = playingData.body.item.name; 
       playingArtista = playingData.body.item.artists[0].name;
       playingFoto = playingData.body.item.album.images[0].url;   
-      MusicaTocando = true;
+      MusicaTocando = true; 
     }
     else {
       playingMusica = "Clique";
@@ -132,6 +133,9 @@ app.get('/main', (req, res) => {
       MusicaTocando = false;  
     }
     idUsuario = meData.body.id;
+    /* console.log("nome da musica: " + playingMusica);
+    console.log("nome do artista: " + playingArtista);
+    console.log("url da foto" + playingFoto) */
     res.render("main", {artistas: artistas, musicas: musicas, musicasRecentes: musicasRecentes, playingMusica: playingMusica, playingArtista: playingArtista, playingFoto: playingFoto});
   }, function(err) {
     res.redirect(`http://localhost:8888/erro?erro=${err.statusCode}`); 
@@ -148,7 +152,7 @@ app.get('/config', (req, res) => {
     let ArrayDevices = [];
     
     if(playlistsData.body.items.length < 1){
-      p = new Playlist("Sem playlists", "images/nada.jpeg", "Adicione playlists na sua bibloteca para tocá-las por aqui.");
+      p = new Playlist("Sem playlists", "images/nada.jpeg", "Adicione playlists na sua bibloteca para tocá-las por aqui.");  
       ArrayPlaylist.push(p); 
     }
     else{
@@ -193,6 +197,8 @@ app.get('/player', (req, res) => {
 
   var playlist = req.query.playlist;
   var device = req.query.device;
+  //console.log(playlist);
+  //console.log(device); 
 
   spotifyApi.play({
     "context_uri": playlist,
