@@ -1,5 +1,6 @@
 const express = require('express');
 const SpotifyWebApi = require('spotify-web-api-node');
+require('dotenv').config();
 
 const port = 8888;
 const scopes = [
@@ -25,8 +26,8 @@ const scopes = [
 ];
 
 var spotifyApi = new SpotifyWebApi({
-    clientId: "<SEU_CLIENT_ID>",
-    clientSecret: "SEU_CLIENT_SECRET",
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
     redirectUri: "http://localhost:8888/callback",
 });
 
